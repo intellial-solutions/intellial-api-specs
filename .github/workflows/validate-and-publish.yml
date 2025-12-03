@@ -33,23 +33,48 @@ jobs:
     - name: Build Swagger UI Documentation
       run: |
         mkdir -p docs
-        touch docs/.nojekyll   # <--- Prevent Jekyll build
+        touch docs/.nojekyll
+
+        LINKS=""
 
         for file in $(find api-specs -name "openapi.yml"); do
-          app=$(basename $(dirname $file))
-          mkdir -p "docs/${app}-ui"
+          app=$(basename $(dirname "$file"))
+          ui_folder="${app}-ui"
 
-          # Copy spec
-          cp "$file" "docs/${app}-ui/openapi.yml"
+          mkdir -p "docs/${ui_folder}"
 
-          # Download Swagger UI HTML
+          cp "$file" "docs/${ui_folder}/openapi.yml"
+
           curl -L https://raw.githubusercontent.com/swagger-api/swagger-ui/master/dist/index.html \
-            > "docs/${app}-ui/index.html"
+            > "docs/${ui_folder}/index.html"
 
-          # Point UI to openapi.yml
-          sed -i 's#https://petstore.swagger.io/v2/swagger.json#/openapi.yml#g' "docs/${app}-ui/index.html"
+          sed -i 's#https://petstore.swagger.io/v2/swagger.json#/openapi.yml#g' "docs/${ui_folder}/index.html"
+
+          LINKS="${LINKS}<li><a href=\"./${ui_folder}/\">${app}</a></li>"
         done
 
+        cat <<EOF > docs/index.html
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8"/>
+          <title>Intellial API Documentation</title>
+          <style>
+            body { font-family: Arial, sans-serif; margin: 40px; }
+            h1 { font-size: 24px; margin-bottom: 20px; }
+            ul { line-height: 1.8; padding-left: 20px; }
+            a { font-size: 1.1rem; text-decoration: none; }
+            a:hover { text-decoration: underline; }
+          </style>
+        </head>
+        <body>
+          <h1>API Documentation Index</h1>
+          <ul>
+            ${LINKS}
+          </ul>
+        </body>
+        </html>
+        EOF
 
     - name: Publish
       uses: peaceiris/actions-gh-pages@v3
