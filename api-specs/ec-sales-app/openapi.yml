@@ -15,7 +15,7 @@ paths:
   /ecpy/token/:
     post:
       summary: Get Authentication Token
-      description: To generate a JWT bearer token using credentials.
+      description: To generate a JWT bearer token using the credentials.
       tags: [Authentication]
 
       requestBody:
