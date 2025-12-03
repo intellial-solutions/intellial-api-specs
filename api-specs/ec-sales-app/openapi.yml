@@ -15,7 +15,7 @@ paths:
   /ecpy/token/:
     post:
       summary: Get Authentication Token
-      description: Generates a JWT bearer token using credentials.
+      description: To generate a JWT bearer token using credentials.
       tags: [Authentication]
 
       requestBody:
@@ -46,7 +46,7 @@ paths:
   /ecpy/sales/get_customer_usage_engagement/:
     post:
       summary: Customer Engagement Usage Report
-      description: Fetch customer usage, engagement, and statistical data.
+      description: To fetch customer usage, engagement, and statistical data.
       tags: [Reports]
       security:
         - bearerAuth: []
