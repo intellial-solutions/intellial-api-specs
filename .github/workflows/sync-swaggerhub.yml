@@ -22,22 +22,28 @@ jobs:
       env:
         SWAGGERHUB_API_KEY: ${{ secrets.SWAGGERHUB_API_KEY }}
       run: |
-        for spec in $(git diff --name-only HEAD~1 HEAD | grep "api-specs/.*/openapi.yml"); do
+        for spec in $(find api-specs -name "openapi.yml"); do
           echo "Processing: $spec"
 
-          # Extract app name and version
           app=$(echo "$spec" | cut -d'/' -f2)
           version=$(grep -m 1 "version:" "$spec" | awk '{print $2}')
 
           echo "App: $app, Version: $version"
 
-          # Push spec
           swaggerhub api:update \
             intellial-solutions/$app/$version \
             --file "$spec" \
             --token $SWAGGERHUB_API_KEY \
             --visibility private \
-            --force
-
+            --force \
+            --debug || {
+            echo "--- SwaggerHub update failed, trying CREATE ---"
+            swaggerhub api:create \
+                intellial-solutions/$app/$version \
+                --file "$spec" \
+                --token $SWAGGERHUB_API_KEY \
+                --visibility private \
+                --debug
+            }
           echo "Uploaded $app v$version to SwaggerHub"
         done

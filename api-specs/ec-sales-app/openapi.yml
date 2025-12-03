@@ -12,7 +12,6 @@ servers:
     description: Primary Production Server
 
 paths:
-
   /ecpy/token/:
     post:
       summary: Get Authentication Token
