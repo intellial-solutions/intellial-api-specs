@@ -15,10 +15,12 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: Find changed APIs and upload to SwaggerHub
+    - name: Sync Specs to SwaggerHub
       env:
         SWAGGERHUB_API_KEY: ${{ secrets.SWAGGERHUB_API_KEY }}
       run: |
+        npm install -g @smartbear/swaggerhub-cli
+
         for spec in $(find api-specs -name "openapi.yml"); do
         echo "Processing: $spec"
 
@@ -27,23 +29,24 @@ jobs:
 
         echo "App: $app, Version: $version"
 
-        npx swaggerhub api:update \
+        # UPDATE attempt
+        swaggerhub api:update \
             intellial-solutions/$app/$version \
             --file "$spec" \
-            --token $SWAGGERHUB_API_KEY \
+            --apikey $SWAGGERHUB_API_KEY \
             --visibility private \
-            --force \
-            --debug || {
+            --publish=false || {
 
-            echo "--- SwaggerHub update failed, trying CREATE ---"
+            echo "--- update failed, trying CREATE ---"
 
-            npx swaggerhub api:create \
+            swaggerhub api:create \
             intellial-solutions/$app/$version \
             --file "$spec" \
-            --token $SWAGGERHUB_API_KEY \
+            --apikey $SWAGGERHUB_API_KEY \
             --visibility private \
-            --debug
+            --publish=false
         }
 
         echo "Uploaded $app v$version to SwaggerHub"
         done
+
