@@ -1,0 +1,43 @@
+name: Sync OpenAPI to SwaggerHub
+
+on:
+  push:
+    paths:
+      - 'api-specs/**/openapi.yml'
+    branches:
+      - main
+      - development
+
+jobs:
+  swaggerhub-sync:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Install SwaggerHub CLI
+      run: npm install -g swaggerhub-cli
+
+    - name: Find changed APIs and upload to SwaggerHub
+      env:
+        SWAGGERHUB_API_KEY: ${{ secrets.SWAGGERHUB_API_KEY }}
+      run: |
+        for spec in $(git diff --name-only HEAD~1 HEAD | grep "api-specs/.*/openapi.yml"); do
+          echo "Processing: $spec"
+
+          # Extract app name and version
+          app=$(echo "$spec" | cut -d'/' -f2)
+          version=$(grep -m 1 "version:" "$spec" | awk '{print $2}')
+
+          echo "App: $app, Version: $version"
+
+          # Push spec
+          swaggerhub api:update \
+            intellial-solutions/$app/$version \
+            --file "$spec" \
+            --token $SWAGGERHUB_API_KEY \
+            --visibility private \
+            --force
+
+          echo "Uploaded $app v$version to SwaggerHub"
+        done
