@@ -33,7 +33,7 @@ paths:
                   example: "********"
       responses:
         "200":
-          description: Token successfully generated
+          description: Token generated successfully
           content:
             application/json:
               example:
