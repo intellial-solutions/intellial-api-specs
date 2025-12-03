@@ -37,22 +37,34 @@ jobs:
 
         LINKS=""
 
+        # Download full Swagger UI dist
+        curl -L https://github.com/swagger-api/swagger-ui/archive/refs/heads/master.zip -o swagger.zip
+        unzip swagger.zip
+        cp -r swagger-ui-master/dist swagger-dist
+
         for file in $(find api-specs -name "openapi.yml"); do
           app=$(basename $(dirname "$file"))
           ui_folder="${app}-ui"
 
           mkdir -p "docs/${ui_folder}"
+          
+          # Copy full Swagger dist
+          cp -r swagger-dist/* "docs/${ui_folder}/"
 
+          # Copy OpenAPI spec
           cp "$file" "docs/${ui_folder}/openapi.yml"
 
-          curl -L https://raw.githubusercontent.com/swagger-api/swagger-ui/master/dist/index.html \
-            > "docs/${ui_folder}/index.html"
+          # Update initializer to our local spec
+          sed -i 's#https://petstore.swagger.io/v2/swagger.json#./openapi.yml#g' "docs/${ui_folder}/swagger-initializer.js"
 
-          sed -i 's#https://petstore.swagger.io/v2/swagger.json#/openapi.yml#g' "docs/${ui_folder}/index.html"
-
+          # Build index link
           LINKS="${LINKS}<li><a href=\"./${ui_folder}/\">${app}</a></li>"
         done
 
+        # Cleanup temp swagger files
+        rm -rf swagger-ui-master swagger.zip swagger-dist
+
+        # Generate root index
         cat <<EOF > docs/index.html
         <!DOCTYPE html>
         <html>
