@@ -23,7 +23,7 @@ jobs:
         done
 
   publish-docs:
-    if: github.ref == 'refs/heads/development'
+    if: github.ref == 'refs/heads/main'
     needs: lint-api
     runs-on: ubuntu-latest
 
