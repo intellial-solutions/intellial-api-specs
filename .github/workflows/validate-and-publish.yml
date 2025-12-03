@@ -33,6 +33,7 @@ jobs:
     - name: Build Swagger UI Documentation
       run: |
         mkdir -p docs
+        touch docs/.nojekyll   # <--- Prevent Jekyll build
 
         for file in $(find api-specs -name "openapi.yml"); do
           app=$(basename $(dirname $file))
