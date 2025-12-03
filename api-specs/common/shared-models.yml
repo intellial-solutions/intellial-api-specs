@@ -1,0 +1,24 @@
+openapi: 3.0.3
+info:
+  title: Shared Model Definitions
+  version: 1.0.0
+
+components:
+  schemas:
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: integer
+        size:
+          type: integer
+        total:
+          type: integer
+
+    UserBasic:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string

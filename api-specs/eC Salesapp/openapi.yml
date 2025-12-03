@@ -1,0 +1,57 @@
+openapi: 3.0.3
+info:
+  title: eC Salesapp API
+  description: APIs consumed by eC Salesapp
+  version: 1.0.0
+
+servers:
+  - url: https://api.ecsalesapp.com
+
+paths:
+  /customer:
+    get:
+      summary: Get customer list
+      tags: [Customer]
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+        - in: query
+          name: size
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: List of customers
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  pagination:
+                    $ref: "../common/shared-models.yml#/components/schemas/Pagination"
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/CustomerBasic"
+
+        '500':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "../common/common-errors.yml#/components/schemas/ErrorResponse"
+
+components:
+  schemas:
+    CustomerBasic:
+      type: object
+      properties:
+        id:
+          type: string
+        companyName:
+          type: string
+        email:
+          type: string
+
